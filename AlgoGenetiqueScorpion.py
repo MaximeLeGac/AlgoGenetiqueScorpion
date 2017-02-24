@@ -1,203 +1,250 @@
 import math
 import random
-import CalculFormules
+import ScorpionFormulas
 
 
-TAILLE_POPULATION_SCORPIONS = 10
-NB_GENERATIONS = 10
-TAUX_MUTATION = 5
+#################################################################################################################################
+POPULATION_SIZE             = 10
+NB_GENERATIONS              = 20
+MUTATION_RATE               = 1
+
+TARGET_DISTANCE             = 350
+
+MATERIAL_DENSITY            = 7850
+MATERIAL_YOUNG_MODUL        = 210
+MATERIAL_COEFF_POISSON      = 0.24
+GRAVITY                     = 9.81
+
+ARROW_DENSITY               = 1350
+#################################################################################################################################
 
 def init():
-    population_scorpions = []
-    for i in range(TAILLE_POPULATION_SCORPIONS):
-        population_scorpions.append(genererPopulation())
+    scorpionsPopulation = []
+    for i in range(POPULATION_SIZE):
+        scorpionsPopulation.append(generate_scorpion())
 
     for i in range(NB_GENERATIONS):
-        print("----------------------------------------------------------------------------------------------")
+        print("*******************************************************************************************")
         print("GENERATION "+str(i))
 
-        for i in range(TAILLE_POPULATION_SCORPIONS):    
-            evaluationTirScorpion(population_scorpions[i])
-            print(str(i)+" = "+str(population_scorpions[i][0])+" | "+str(population_scorpions[i][1])+" | "+str(population_scorpions[i][2])+" | "+str(population_scorpions[i][3])+" | "+str(population_scorpions[i][4])+" | "+str(population_scorpions[i][5])+" | "+str(population_scorpions[i][6])+" | "+str(population_scorpions[i][7])+" | "+str(population_scorpions[i][8])+" | "+str(population_scorpions[i][9]))
+        for i in range(POPULATION_SIZE):  
+            print("----------------------------------------------------------------------------------------------")  
+            print("Angle                = "+str(scorpionsPopulation[i][0]))
+            print("Arm length           = "+str(scorpionsPopulation[i][1]))
+            print("Arm's section base   = "+str(scorpionsPopulation[i][2]))
+            print("Arm's section height = "+str(scorpionsPopulation[i][3]))
+            print("Rope length          = "+str(scorpionsPopulation[i][4]))
+            print("Arrow length         = "+str(scorpionsPopulation[i][5]))
+            print("Arrow diameter       = "+str(scorpionsPopulation[i][6]))
+            scorpionEvaluation(scorpionsPopulation[i])
 
-        population_scorpions = selectionParentsScorpions(population_scorpions)
+        scorpionsPopulation = selectionByTournament(scorpionsPopulation)
 
 
 #################################################################################################################################
-# Methode permettant de generer les valeurs des caracteristiques d'un scorpion
-def generationValeurs(index):
+# Generate the values of the caracteristics of a scorpion
+def values_generation(index):
     if index == 0:
-        return random.randint(0, 90)
+        return random.randint(10, 70) # 0 - Angle of the scorpion in degrees
     elif index == 1:
-        return round(random.uniform(0.5, 5), 1)
+        return round(random.uniform(1, 5), 1) # 1 - Arm length in meters
     elif index == 2:
-        return round(random.uniform(0.1, 0.5), 1)
+        return round(random.uniform(0.1, 0.5), 1) # 2 - Arm's section base in meters
     elif index == 3:
-        return round(random.uniform(0.1, 0.5), 1)
+        return round(random.uniform(0.1, 0.5), 1) # 3 - Arm's section height in meters
     elif index == 4:
-        return round(random.uniform(1, 10), 1)
+        return round(random.uniform(1, 5), 1) # 4 - Rope length in meters
     elif index == 5:
-        return round(random.uniform(0.5, 5), 1)
+        return round(random.uniform(0.5, 1), 1) # 5 - Arrow length in meters
     elif index == 6:
-        return 7850
-    elif index == 7:
-        return 210
-    elif index == 8:
-        return 0.24
-    elif index == 9:
-        return 9.81
+        return round(random.uniform(0.1, 0.3), 1) # 6 - Arrow diameter in meters
 
 
 #################################################################################################################################
-# Methode d'initialisation d'un scorpion
-def genererPopulation():
-    angle_hausse                = generationValeurs(0)
-    long_bras                   = generationValeurs(1)
-    base_section                = generationValeurs(2)
-    hauteur_section             = generationValeurs(3)
-    long_corde                  = generationValeurs(4)
-    long_fleche                 = generationValeurs(5)
-    masse_volumique_materiau    = generationValeurs(6)
-    module_young                = generationValeurs(7)
-    coeff_poisson_materiau      = generationValeurs(8)
-    gravite                     = generationValeurs(9)
+# Create a scorpion
+def generate_scorpion():
+    angle                   = values_generation(0)
+    arm_length              = values_generation(1)
+    section_base            = values_generation(2)
+    section_height          = values_generation(3)
+    rope_length             = values_generation(4)
+    arrow_length            = values_generation(5)
+    arrow_diameter          = values_generation(6)
 
     scorpion = [
-                angle_hausse                # 0 - Angle de la hausse en degres
-                ,long_bras                  # 1 - Longueur du bras de l'arc en metres
-                ,base_section               # 2 - Base de la section du bras en metres
-                ,hauteur_section            # 3 - Hauteur de la section du bras en metres
-                ,long_corde                 # 4 - Longueur de la corde en metres
-                ,long_fleche                # 5 - Longueur de la fleche en metres
-                ,masse_volumique_materiau   # 6 - Masse volumique du materiau en kg/m au cube
-                ,module_young               # 7 - Module de Young en Gpa
-                ,coeff_poisson_materiau     # 8 - Coefficient de Poisson du materiau utilise
-                ,gravite                    # 9 - Gravite terrestre
-                ] # on stocke ces valeurs dans un tableau pour pouvoir realiser le croisement plus facilement
+                angle                   # 0 - Angle of the scorpion in degrees
+                ,arm_length             # 1 - Arm length in meters
+                ,section_base           # 2 - Arm's section base in meters
+                ,section_height         # 3 - Arm's section height in meters
+                ,rope_length            # 4 - Rope length in meters
+                ,arrow_length           # 5 - Arrow length in meters
+                ,arrow_diameter         # 6 - Arrow diameter in meters
+                ]
 
     return scorpion
 
 
 #################################################################################################################################
-# Methode permettant de noter les scorpions en fonction de leur tir
-def evaluationTirScorpion(scorpion):
+# Evaluation of a scorpion on his shoot
+def scorpionEvaluation(scorpion):
     
-    ressort                 = CalculFormules.ressort(scorpion[7], scorpion[8])
-    longueur_a_vide         = CalculFormules.longueurAVide(scorpion[1], scorpion[4])
-    longueur_deplacement    = CalculFormules.longueurDeplacement(scorpion[5], longueur_a_vide)
-    masse_projectile        = CalculFormules.masseProjectile(scorpion[6], scorpion[2], scorpion[3], scorpion[5])
-    velocite                = CalculFormules.velocite(ressort, longueur_deplacement, masse_projectile)
-    portee                  = CalculFormules.portee(velocite, scorpion[9], scorpion[0])
-    energie_impact          = CalculFormules.energieImpact(masse_projectile, velocite)
-    energie_gramme_TNT      = CalculFormules.equivalenceJouleGrammeTNT(energie_impact)
-    moment_quadratique      = CalculFormules.momentQuadratique(scorpion[2], scorpion[3])
-    force_traction          = CalculFormules.forceTraction(ressort, scorpion[5])
-    fleche_bras_max         = CalculFormules.flecheBrasMax(force_traction, scorpion[1], scorpion[7], moment_quadratique)
+    spring              = ScorpionFormulas.spring(MATERIAL_YOUNG_MODUL, MATERIAL_COEFF_POISSON)
+    empty_length        = ScorpionFormulas.empty_length(scorpion[1], scorpion[4])
+    movement_length     = ScorpionFormulas.movement_length(scorpion[5], empty_length)
 
-    scorpion.append(0)
+    quadratic_moment    = ScorpionFormulas.quadratic_moment(scorpion[2], scorpion[3])
+    traction_force      = ScorpionFormulas.traction_force(spring, movement_length)
+    arrow_arm_max       = ScorpionFormulas.arrow_arm_max(traction_force, scorpion[1], MATERIAL_YOUNG_MODUL, quadratic_moment)
 
-    # Si le bras casse
-    if longueur_deplacement > fleche_bras_max:
-        scorpion[10] += 1
+    projectile_mass     = ScorpionFormulas.projectile_mass(ARROW_DENSITY, scorpion[6], scorpion[5])
+    velocity            = ScorpionFormulas.velocity(spring, movement_length, projectile_mass)
+    reach               = ScorpionFormulas.reach(velocity, GRAVITY, scorpion[0])
+    impact_energy       = ScorpionFormulas.impact_energy(projectile_mass, velocity)
+    energy_grams_TNT    = ScorpionFormulas.energy_grams_TNT(impact_energy)
+
+    scorpion.append(0) # Initialisation of the scorpion's score
+    print("")
+    print("empty_length = "+str(empty_length))
+    print("movement_length = "+str(movement_length))
+    print("projectile_mass = "+str(projectile_mass))
+    print("velocity = "+str(velocity))
+    print("reach = "+str(reach))
+    print("impact_energy = "+str(impact_energy))
+    print("energy_grams_TNT = "+str(energy_grams_TNT))
+
+    '''# If the arm doesn't break
+        if movement_length < arrow_arm_max:
+            # If length when empty is inferior to the length of the arrow
+            if empty_length < scorpion[5]:
+                # If the arrow's length is inferior to the arc's length
+                if scorpion[4] < scorpion[1]:
+                    # If the shoot's reach is superior to 0
+                    if reach > 0:
+                        scorpion_score = abs(1 / ((reach - TARGET_DISTANCE) + 0.0000001))
+                        scorpion[7] = scorpion_score'''
+
+
+    
+
+    # If the arm doesn't break
+    if movement_length > arrow_arm_max:
+        scorpion[7] += 1
     else:
-        scorpion[10] += 3
+        scorpion[7] += 3
 
-    # Si longueur a vide est superieure a la longueur de le fleche
-    if longueur_a_vide > scorpion[5]:
-        scorpion[10] += 1
+    # If length when empty is inferior to the length of the arrow
+    if empty_length > scorpion[5]:
+        scorpion[7] += 1
     else:
-        scorpion[10] += 3
+        scorpion[7] += 3
 
-    # Si longueur de la corde est superieure a la longueur de l'arc
+    # If the arrow's length is inferior to the arc's length
     if scorpion[4] > scorpion[1]:
-        scorpion[10] += 1
+        scorpion[7] += 1
     else:
-        scorpion[10] += 3
+        scorpion[7] += 3
 
-    # Si la portee du tir s'approche des 300m
-    if 250 <= portee <= 350:
-        scorpion[10] += 10
+    # If the shoot's reach goes near the target
+    if reach <= 0:
+        scorpion[7] += 0
+    elif 300 <= reach <= 400:
+        scorpion[7] += 10
+    elif 250 <= reach <= 450:
+        scorpion[7] += 7
+    elif 150 <= reach <= 550:
+        scorpion[7] += 4
     else:
-        scorpion[10] += 1
+        scorpion[7] += 1
 
-    # Si la puissance du tir est importante
+    # If the shoot's power is significant
 
+    print("SCORE = "+str(scorpion[7]))
 
 
 #################################################################################################################################
-# On utilise la methode de selection par tournoi
-def selectionParentsScorpions(population_scorpions):
+# Selection of the scorpions who will become parents of the next generation
+def selectionByTournament(scorpionsPopulation):
     index = 0
-    paires = []
+    pairs = []
     parents = []
-    nouvelle_generation = []
+    new_generation = []
 
-    # On creer autant de paires de parents qu'il y a de scorpion
-    for i in range(TAILLE_POPULATION_SCORPIONS):
-        if index == 9:
-            paires.append([population_scorpions[index], population_scorpions[0]])
+    # We create as much pairs of parents than scorpions in our population
+    for i in range(POPULATION_SIZE):
+        if index == (POPULATION_SIZE-1):
+            pairs.append([scorpionsPopulation[index], scorpionsPopulation[0]])
         else:
-            paires.append([population_scorpions[index], population_scorpions[index+1]])
-
+            pairs.append([scorpionsPopulation[index], scorpionsPopulation[index+1]])
         index += 1
 
-    for i in range(TAILLE_POPULATION_SCORPIONS):
-        proba_selection = random.randint(0, 100) # probabilite que le meilleur scorpion soit choisi
-        # On genere un tableau qui va contenir tous les scorpions choisient pour etre parents
-        if 0 <= proba_selection <= 80:
-            if paires[i][0][10] > paires[i][1][10]:
-                parents.append(paires[i][0])
+    for i in range(POPULATION_SIZE):
+        selection_probability = random.randint(0, 100) # probability that the best scorpion of the match is chosen
+        # We generate a table which will contain all the scorpions chosen to be parents
+        if 0 <= selection_probability <= 80:
+            if pairs[i][0][7] > pairs[i][1][7]:
+                parents.append(pairs[i][0])
             else:
-                parents.append(paires[i][1])
+                parents.append(pairs[i][1])
         else:
-            if paires[i][0][10] < paires[i][1][10]:
-                parents.append(paires[i][0])
+            if pairs[i][0][7] < pairs[i][1][7]:
+                parents.append(pairs[i][0])
             else:
-                parents.append(paires[i][1])
+                parents.append(pairs[i][1])
     
     index = 0
-    while index != 10:
-        #nouvelle_generation.append(croisementScorpions(parents[index], parents[index+1]))
-        croisementScorpions(parents[index], parents[index+1], nouvelle_generation)
+    while index != POPULATION_SIZE:
+        #new_generation.append(scorpionsCrossbreeding(parents[index], parents[index+1]))
+        scorpionsCrossbreeding(parents[index], parents[index+1], new_generation)
         index += 2
 
-    random.shuffle(nouvelle_generation)
-    return nouvelle_generation
+    random.shuffle(new_generation)
+    return new_generation
 
 
 #################################################################################################################################
-# Methode de croisement de 2 scorpions
-# permet de creer 2 nouveaux scorpions a partir des valeurs des 2 scorpions en parametre
-def croisementScorpions(scorpion1, scorpion2, nouvelle_generation):
-    hauteur_croisement = random.randint(0,9) # Nombre pour choisir au niveau de quel attribut "couper" les scorpions parents
+# Allow to create 2 new scorpions from the values of 2 parents scorpions passed in parameters
+def scorpionsCrossbreeding(scorpion1, scorpion2, new_generation):
+    crossing_height = random.randint(1,6) # Nombre pour choisir au niveau de quel attribut "couper" les scorpions parents
 
-    bebe_scorpion1 = []
-    bebe_scorpion2 = []
+    baby_scorpion_1 = []
+    baby_scorpion_2 = []
+    
+    '''print("*******************************************************************************************")
+                print("PARENT 1 = "+str(scorpion1[0])+" | "+str(scorpion1[1])+" | "+str(scorpion1[2])+" | "+str(scorpion1[3])+" | "+str(scorpion1[4])+" | "+str(scorpion1[5])+" | "+str(scorpion1[6])+" ==> "+str(scorpion1[7]))    
+                print("PARENT 2 = "+str(scorpion2[0])+" | "+str(scorpion2[1])+" | "+str(scorpion2[2])+" | "+str(scorpion2[3])+" | "+str(scorpion2[4])+" | "+str(scorpion2[5])+" | "+str(scorpion2[6])+" ==> "+str(scorpion2[7]))
+                print("crossing_height : "+str(crossing_height))'''
 
-    # Creation de la 1ere moitie de chaque enfant
-    for i in range(hauteur_croisement):
-        bebe_scorpion1.append(scorpion1[i])
-        bebe_scorpion2.append(scorpion2[i])
+    # Creation of the first half of each child
+    for i in range(crossing_height):
+        baby_scorpion_1.append(scorpion1[i])
+        baby_scorpion_2.append(scorpion2[i])
 
-    # Creation de la 2eme moitie de chaque enfant
-    for i in range(hauteur_croisement, 10):
-        bebe_scorpion1.append(scorpion1[i])
-        bebe_scorpion2.append(scorpion2[i])
+    # Creation of the second half of each child
+    for i in range(crossing_height, 7):
+        baby_scorpion_1.append(scorpion2[i])
+        baby_scorpion_2.append(scorpion1[i])
 
-    mutation(bebe_scorpion1)
-    mutation(bebe_scorpion2)
 
-    nouvelle_generation.append(bebe_scorpion1)
-    nouvelle_generation.append(bebe_scorpion2)
+    #print("BABY 1 = "+str(baby_scorpion_1[0])+" | "+str(baby_scorpion_1[1])+" | "+str(baby_scorpion_1[2])+" | "+str(baby_scorpion_1[3])+" | "+str(baby_scorpion_1[4])+" | "+str(baby_scorpion_1[5])+" | "+str(baby_scorpion_1[6]))
+    #print("BABY 2 = "+str(baby_scorpion_2[0])+" | "+str(baby_scorpion_2[1])+" | "+str(baby_scorpion_2[2])+" | "+str(baby_scorpion_2[3])+" | "+str(baby_scorpion_2[4])+" | "+str(baby_scorpion_2[5])+" | "+str(baby_scorpion_2[6]))
 
-    return bebe_scorpion1, bebe_scorpion2
+    mutation(baby_scorpion_1)
+    mutation(baby_scorpion_2)
+
+    #print("BABY 1 = "+str(baby_scorpion_1[0])+" | "+str(baby_scorpion_1[1])+" | "+str(baby_scorpion_1[2])+" | "+str(baby_scorpion_1[3])+" | "+str(baby_scorpion_1[4])+" | "+str(baby_scorpion_1[5])+" | "+str(baby_scorpion_1[6]))
+    #print("BABY 2 = "+str(baby_scorpion_2[0])+" | "+str(baby_scorpion_2[1])+" | "+str(baby_scorpion_2[2])+" | "+str(baby_scorpion_2[3])+" | "+str(baby_scorpion_2[4])+" | "+str(baby_scorpion_2[5])+" | "+str(baby_scorpion_2[6]))
+
+    new_generation.append(baby_scorpion_1)
+    new_generation.append(baby_scorpion_2)
+
+    return baby_scorpion_1, baby_scorpion_2
 
 
 #################################################################################################################################
-# Chaque enfant a une probabilite qu'une de ses caracteristiques change
-def mutation(bebe_scorpion):
+# Each child has a probability that one of its values mutate
+def mutation(baby_scorpion):
     mutation_rate = random.randint(0,100)
-
-    if 0 <= mutation_rate <= TAUX_MUTATION:
-        index_caracteristique = random.randint(0,5) # Chiffre permettant de choisir la caracteristique a faire muter
-        bebe_scorpion[index_caracteristique] = generationValeurs(index_caracteristique)
+    #print("mutation_rate : "+str(mutation_rate))
+    if 0 <= mutation_rate <= MUTATION_RATE:
+        value_index = random.randint(0,6) # Number allowing us to know which value to change
+        baby_scorpion[value_index] = values_generation(value_index)

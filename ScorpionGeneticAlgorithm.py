@@ -1,6 +1,7 @@
 import math
 import random
 import ScorpionFormulas
+import GraphicsGestion
 
 
 #################################################################################################################################
@@ -20,6 +21,10 @@ ARROW_DENSITY               = 1350
 
 def init():
     scorpionsPopulation = []
+    reach_tab = []
+    energy_tab = []
+    score_tab = []
+
     for i in range(POPULATION_SIZE):
         scorpionsPopulation.append(generate_scorpion())
 
@@ -36,9 +41,11 @@ def init():
             print("Rope length          = "+str(scorpionsPopulation[i][4]))
             print("Arrow length         = "+str(scorpionsPopulation[i][5]))
             print("Arrow diameter       = "+str(scorpionsPopulation[i][6]))
-            scorpionEvaluation(scorpionsPopulation[i])
+            scorpionEvaluation(scorpionsPopulation[i], reach_tab, energy_tab, score_tab)
 
         scorpionsPopulation = selectionByTournament(scorpionsPopulation)
+
+    GraphicsGestion.graphics(reach_tab, energy_tab, score_tab)
 
 
 #################################################################################################################################
@@ -86,7 +93,7 @@ def generate_scorpion():
 
 #################################################################################################################################
 # Evaluation of a scorpion on his shoot
-def scorpionEvaluation(scorpion):
+def scorpionEvaluation(scorpion, reach_tab, energy_tab, score_tab):
     
     spring              = ScorpionFormulas.spring(MATERIAL_YOUNG_MODUL, MATERIAL_COEFF_POISSON)
     empty_length        = ScorpionFormulas.empty_length(scorpion[1], scorpion[4])
@@ -102,7 +109,7 @@ def scorpionEvaluation(scorpion):
     impact_energy       = ScorpionFormulas.impact_energy(projectile_mass, velocity)
     energy_grams_TNT    = ScorpionFormulas.energy_grams_TNT(impact_energy)
 
-    scorpion.append(0) # Initialisation of the scorpion's score
+    scorpion.append(1) # Initialisation of the scorpion's score
     print("")
     print("empty_length = "+str(empty_length))
     print("movement_length = "+str(movement_length))
@@ -159,6 +166,10 @@ def scorpionEvaluation(scorpion):
     # If the shoot's power is significant
 
     print("SCORE = "+str(scorpion[7]))
+
+    reach_tab.append(reach)
+    energy_tab.append(energy_grams_TNT)
+    score_tab.append(scorpion[7])
 
 
 #################################################################################################################################

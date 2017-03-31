@@ -6,7 +6,7 @@ import GraphicsGestion
 
 #################################################################################################################################
 POPULATION_SIZE             = 2000          # Number of scorpions in a generation
-NB_GENERATIONS              = 50           # Number of generations of scorpions
+NB_GENERATIONS              = 60            # Number of generations of scorpions
 MUTATION_RATE               = 0.1           # Percentage of chance that a mutation occurs to a baby scorpion
 TARGET_DISTANCE             = 350           # Distance (in meters) to the target
 
@@ -46,25 +46,10 @@ def init():
 
     # Loop on all generations
     for i in range(NB_GENERATIONS):
-        '''print("*******************************************************************************************************")
-                                print("******************************************** "+"GENERATION "+str(i)+" ********************************************")
-                                print("*******************************************************************************************************")'''
         score_tab_generation = []
 
         # Loop on the population of the current generation
         for i in range(POPULATION_SIZE):
-            '''if i == NB_GENERATIONS:
-                    print("----------------------------------------------------------------------------------")
-                    print("--------------------------------------- "+str(i)+" ---------------------------------------")
-                    print("----------------------------------------------------------------------------------")
-                    print("Angle                = "+str(scorpionsPopulation[i][0]))
-                    print("Arm length           = "+str(scorpionsPopulation[i][1]))
-                    print("Arm's section base   = "+str(scorpionsPopulation[i][2]))
-                    print("Arm's section height = "+str(scorpionsPopulation[i][3]))
-                    print("Rope length          = "+str(scorpionsPopulation[i][4]))
-                    print("Arrow length         = "+str(scorpionsPopulation[i][5]))
-                    print("Arrow diameter       = "+str(scorpionsPopulation[i][6]))'''
-
             # Call to the function of evaluation of the current scorpion's shoot
             scorpionEvaluation(scorpionsPopulation[i], reach_tab, energy_tab, score_tab, score_tab_generation, mass_tab, velocity_tab)
 
@@ -76,7 +61,7 @@ def init():
         all_score_tab.append(get_average_generation(score_tab))
         score_tab = []
 
-        # Call to the fitness function that will select the parents who will reproduce
+        # Call to the function that will select the parents who will reproduce
         # The next generation will be created from the individuals of the current generation selected
         # A mutation has a chance to occurs on each children
         scorpionsPopulation = selectionByTournament(scorpionsPopulation)
@@ -84,6 +69,7 @@ def init():
         # Calculation of the variance
         variance = GraphicsGestion.get_variance(score_tab_generation) # We get a variance score for each generation based on the scores of each generations
         variance_tab.append(variance)
+
 
     # Call to the function who will create the graphics of variance, reach, energy, score, projectile's mass and velocity
     GraphicsGestion.graphics(variance_tab, all_reach_tab, all_energy_tab, all_score_tab, mass_tab, velocity_tab)
@@ -181,7 +167,7 @@ def scorpionEvaluation(scorpion, reach_tab, energy_tab, score_tab, score_tab_gen
     else:
         scorpion[7] += 10
 
-    # If the arrow's length is inferior to the arc's length
+    # If the rope's length is inferior to the arc's length
     if scorpion[4] > scorpion[1]:
         scorpion[7] += 1
     else:
@@ -191,20 +177,10 @@ def scorpionEvaluation(scorpion, reach_tab, energy_tab, score_tab, score_tab_gen
     if reach <= 0:
         scorpion[7] += 1
     else:
-        scorpion[7] += (TARGET_DISTANCE-abs(TARGET_DISTANCE-reach))*10
+        scorpion[7] += (TARGET_DISTANCE-abs(TARGET_DISTANCE-reach))*60
 
     # If the shoot's power is significant enough
-    scorpion[7] += energy_grams_TNT*10
-
-    '''print("")
-                print("empty_length = "+str(empty_length))
-                print("movement_length = "+str(movement_length))
-                print("projectile_mass = "+str(projectile_mass))
-                print("velocity = "+str(velocity))
-                print("reach = "+str(reach))
-                print("impact_energy = "+str(impact_energy))
-                print("energy_grams_TNT = "+str(energy_grams_TNT))
-                print("SCORE = "+str(scorpion[7]))'''
+    scorpion[7] += energy_grams_TNT*20
 
     # The results are put in tables which will be used to create the graphics
     reach_tab.append(reach)
@@ -249,8 +225,8 @@ def selectionByTournament(scorpionsPopulation):
 
     index = 0
     while index != POPULATION_SIZE:
-        #new_generation.append(scorpionsCrossbreeding(parents[index], parents[index+1]))
-        scorpionsCrossbreeding(parents[index], parents[index+1], new_generation) # Call to the crossbreeding who will create the next generation
+        # Call to the crossbreeding who will create the next generation
+        scorpionsCrossbreeding(parents[index], parents[index+1], new_generation)
         index += 2
 
     random.shuffle(new_generation)
@@ -265,11 +241,6 @@ def scorpionsCrossbreeding(scorpion1, scorpion2, new_generation):
     baby_scorpion_1 = []
     baby_scorpion_2 = []
 
-    #print("*******************************************************************************************")
-    #print("PARENT 1 = "+str(scorpion1[0])+" | "+str(scorpion1[1])+" | "+str(scorpion1[2])+" | "+str(scorpion1[3])+" | "+str(scorpion1[4])+" | "+str(scorpion1[5])+" | "+str(scorpion1[6])+" ==> "+str(scorpion1[7]))
-    #print("PARENT 2 = "+str(scorpion2[0])+" | "+str(scorpion2[1])+" | "+str(scorpion2[2])+" | "+str(scorpion2[3])+" | "+str(scorpion2[4])+" | "+str(scorpion2[5])+" | "+str(scorpion2[6])+" ==> "+str(scorpion2[7]))
-    #print("crossing_height : "+str(crossing_height))
-
     # Creation of the first half of each child based on the first half of each parents
     for i in range(crossing_height):
         baby_scorpion_1.append(scorpion1[i])
@@ -280,15 +251,9 @@ def scorpionsCrossbreeding(scorpion1, scorpion2, new_generation):
         baby_scorpion_1.append(scorpion2[i])
         baby_scorpion_2.append(scorpion1[i])
 
-    #print("BABY 1 = "+str(baby_scorpion_1[0])+" | "+str(baby_scorpion_1[1])+" | "+str(baby_scorpion_1[2])+" | "+str(baby_scorpion_1[3])+" | "+str(baby_scorpion_1[4])+" | "+str(baby_scorpion_1[5])+" | "+str(baby_scorpion_1[6]))
-    #print("BABY 2 = "+str(baby_scorpion_2[0])+" | "+str(baby_scorpion_2[1])+" | "+str(baby_scorpion_2[2])+" | "+str(baby_scorpion_2[3])+" | "+str(baby_scorpion_2[4])+" | "+str(baby_scorpion_2[5])+" | "+str(baby_scorpion_2[6]))
-
     # Call to the mutation function on each child
     mutation(baby_scorpion_1)
     mutation(baby_scorpion_2)
-
-    #print("BABY 1 = "+str(baby_scorpion_1[0])+" | "+str(baby_scorpion_1[1])+" | "+str(baby_scorpion_1[2])+" | "+str(baby_scorpion_1[3])+" | "+str(baby_scorpion_1[4])+" | "+str(baby_scorpion_1[5])+" | "+str(baby_scorpion_1[6]))
-    #print("BABY 2 = "+str(baby_scorpion_2[0])+" | "+str(baby_scorpion_2[1])+" | "+str(baby_scorpion_2[2])+" | "+str(baby_scorpion_2[3])+" | "+str(baby_scorpion_2[4])+" | "+str(baby_scorpion_2[5])+" | "+str(baby_scorpion_2[6]))
 
     new_generation.append(baby_scorpion_1)
     new_generation.append(baby_scorpion_2)
@@ -300,7 +265,6 @@ def scorpionsCrossbreeding(scorpion1, scorpion2, new_generation):
 # Each child has a probability that one of its values mutate
 def mutation(baby_scorpion):
     mutation_rate = random.randint(0,100)
-    #print("mutation_rate : "+str(mutation_rate))
 
     if 0 <= mutation_rate <= MUTATION_RATE:
         value_index = random.randint(0,6) # Number allowing us to know which value to change

@@ -167,7 +167,7 @@ def scorpionEvaluation(scorpion, reach_tab, energy_tab, score_tab, score_tab_gen
     else:
         scorpion[7] += 10
 
-    # If the rope's length is inferior to the arc's length
+    # If the rope's length is superior to the arc's length
     if scorpion[4] > scorpion[1]:
         scorpion[7] += 1
     else:
@@ -177,7 +177,7 @@ def scorpionEvaluation(scorpion, reach_tab, energy_tab, score_tab, score_tab_gen
     if reach <= 0:
         scorpion[7] += 1
     else:
-        scorpion[7] += (TARGET_DISTANCE-abs(TARGET_DISTANCE-reach))*60
+        scorpion[7] += (TARGET_DISTANCE-abs(TARGET_DISTANCE-reach))*80
 
     # If the shoot's power is significant enough
     scorpion[7] += energy_grams_TNT*20
